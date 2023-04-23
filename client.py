@@ -1,8 +1,9 @@
-import chatlib  # To use chatlib functions or consts, use chatlib.****
+import chatlib
 import socket
 
-SERVER_IP = "127.0.0.1"  # Our server will run on same computer as client
-SERVER_PORT = 5678
+
+SERVER_IP = "192.168.1.104"  # Our server will run on same computer as client
+SERVER_PORT = 99
 
 # HELPER SOCKET METHODS
 
@@ -11,7 +12,7 @@ def build_and_send_message(conn, code, data):
 
     conn.send(msg.encode())
     print("Client sent this massage: " + msg + "\n")
-    return 
+    return
 	
 
 def recv_message_and_parse(conn):
@@ -26,16 +27,12 @@ def recv_message_and_parse(conn):
     cmd, data = chatlib.parse_message(resp)
     return cmd, data
 
-	
-	
 
 def connect():
-    # Implement Code
-    socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    # connect to the server
-    socket.connect((SERVER_IP, SERVER_PORT))
+    conn = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    conn.connect((SERVER_IP, SERVER_PORT))
+    return conn
 
-    return socket
 
 
 def error_and_exit(error_msg):
@@ -45,21 +42,33 @@ def error_and_exit(error_msg):
 
 
 def login(conn):
-    username = input("Please enter username: \n")
-    # Implement code
-	
-	build_and_send_message(conn, chatlib.PROTOCOL_CLIENT["login_msg"],"")
-	
-	# Implement code
-	
-    pass
+
+    while True:
+        username = input("Please enter username: \n")
+        password = input("Please enter your password: \n")
+        data = chatlib.join_data([username, password])
+        build_and_send_message(conn, chatlib.PROTOCOL_CLIENT["login_msg"], data)
+
+        res, _ = recv_message_and_parse(conn)
+        if res == chatlib.PROTOCOL_SERVER["login_ok_msg"]:
+            print("login is ok, " + username + "! \n")
+            break
+        else:
+            print("login failed! try again - \n")
+
 
 def logout(conn):
-    # Implement code
-    pass
+    build_and_send_message(conn, chatlib.PROTOCOL_CLIENT["logout_msg"], '')
+    res, _ = recv_message_and_parse(conn)
+    if res == chatlib.PROTOCOL_SERVER["login_ok_msg"]:
+        print("you logged out successfully")
+        conn.close()
+
 
 def main():
-    # Implement code
+    conn = connect()
+    login(conn)
+    logout(conn)
     pass
 
 if __name__ == '__main__':

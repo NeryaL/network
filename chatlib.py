@@ -86,5 +86,3 @@ def join_data(msg_fields):
 	"""
 	# Implement code ...
 	return "#".join(str(x) for x in msg_fields)
-
-pass
