@@ -1,6 +1,10 @@
 import socket
+
+
 my_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-my_socket.connect(("127.0.0.1", 8821))
+my_socket.bind(("192.168.1.104", 8828))
+my_socket.connect(("192.168.1.104", 8828))
+
 
 data = ""
 while data != "Bye":
